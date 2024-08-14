@@ -1,7 +1,7 @@
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/9113740/201498864-2a900c64-d88f-4ed4-b5cf-770bcb57e1f5.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/9113740/201498152-b171abb8-9225-487a-821c-6ff49ee48579.png">
-</picture>
+## IZETTA Assessment
+#### To assess this kindly click on the login when you deploy the app. This should route you to `/dashboard/company` where the component lives
+<img width="1671" alt="Screenshot 2024-08-14 at 17 18 35" src="https://github.com/user-attachments/assets/29f4c4c9-bdc5-4619-8782-d9b54231d71f">
+
 
 <div align="center"><strong>Next.js 14 Admin Dashboard Starter Template With Shadcn-ui</strong></div>
 <div align="center">Built with the Next.js App Router</div>
