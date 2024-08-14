@@ -8,259 +8,250 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { Heading } from '@/components/ui/heading';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trash } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import FileUpload from '../file-upload';
 import { useToast } from '../ui/use-toast';
-const ImgSchema = z.object({
-  fileName: z.string(),
-  name: z.string(),
-  fileSize: z.number(),
-  size: z.number(),
-  fileKey: z.string(),
-  key: z.string(),
-  fileUrl: z.string(),
-  url: z.string()
-});
+import { companyInfoSchema, CompanyInfoValue } from '@/lib/company-info-schema';
+import { cn } from '@/lib/utils';
+import { Link2Icon, UploadIcon } from '@radix-ui/react-icons';
+import { Textarea } from '../ui/textarea';
+
 export const IMG_MAX_LIMIT = 3;
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(3, { message: 'Product Name must be at least 3 characters' }),
-  imgUrl: z
-    .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: 'You can only add up to 3 images' })
-    .min(1, { message: 'At least one image must be added.' }),
-  description: z
-    .string()
-    .min(3, { message: 'Product description must be at least 3 characters' }),
-  price: z.coerce.number(),
-  category: z.string().min(1, { message: 'Please select a category' })
-});
 
-type ProductFormValues = z.infer<typeof formSchema>;
-
-interface ProductFormProps {
-  initialData: any | null;
-  categories: any;
-}
-
-export const CompanyFormData: React.FC<ProductFormProps> = ({
-  initialData,
-  categories
-}) => {
-  const params = useParams();
-  const router = useRouter();
-  const { toast } = useToast();
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const title = initialData ? 'Edit product' : 'Create product';
-  const description = initialData ? 'Edit a product.' : 'Add a new product';
-  const toastMessage = initialData ? 'Product updated.' : 'Product created.';
-  const action = initialData ? 'Save changes' : 'Create';
-
-  const defaultValues = initialData
-    ? initialData
-    : {
-        name: '',
-        description: '',
-        price: 0,
-        imgUrl: [],
-        category: ''
-      };
-
-  const form = useForm<ProductFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues
+export const CompanyFormData = () => {
+  const defaultValues = {
+    companyName: '',
+    webpage: '',
+    description: '',
+    productServiceDesc: '',
+    crm: '',
+    toneOfVoice: '',
+    imgUrl: []
+  };
+  const form = useForm<CompanyInfoValue>({
+    resolver: zodResolver(companyInfoSchema),
+    defaultValues,
+    mode: 'onChange',
+    reValidateMode: 'onChange'
   });
 
-  const onSubmit = async (data: ProductFormValues) => {
-    try {
-      setLoading(true);
-      if (initialData) {
-        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
-      } else {
-        // const res = await axios.post(`/api/products/create-product`, data);
-        // console.log("product", res);
-      }
-      router.refresh();
-      router.push(`/dashboard/products`);
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.'
-      });
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem with your request.'
-      });
-    } finally {
-      setLoading(false);
-    }
+  const onSubmit = (data: CompanyInfoValue) => {
+    console.log(data);
   };
-
-  const onDelete = async () => {
-    try {
-      setLoading(true);
-      //   await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
-      router.refresh();
-      router.push(`/${params.storeId}/products`);
-    } catch (error: any) {
-    } finally {
-      setLoading(false);
-      setOpen(false);
-    }
-  };
-
-  const triggerImgUrlValidation = () => form.trigger('imgUrl');
-
   return (
-    <>
-      {/* <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      /> */}
-      <div className="flex items-center justify-between">
-        <Heading title={title} description={description} />
-        {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )}
+    <div className="mx-auto w-[70%]">
+      <div className="my-8">
+        <h2 className="text-2xl font-bold tracking-tight">
+          Company Information
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Fill out the details about your company and product/service
+        </p>
       </div>
-      <Separator />
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-8"
-        >
+        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
             control={form.control}
-            name="imgUrl"
+            name="companyName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Images</FormLabel>
+                <FormLabel>Company Name</FormLabel>
                 <FormControl>
-                  <FileUpload
-                    onChange={field.onChange}
-                    value={field.value}
-                    onRemove={field.onChange}
+                  <Input
+                    disabled={false}
+                    placeholder="Enter your company Name"
+                    {...field}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <div className="gap-8 md:grid md:grid-cols-3">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Product name"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Product description"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input type="number" disabled={loading} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    disabled={loading}
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          defaultValue={field.value}
-                          placeholder="Select a category"
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {/* @ts-ignore  */}
-                      {categories.map((category) => (
-                        <SelectItem key={category._id} value={category._id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="webpage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Company Webpage</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={false}
+                    placeholder="https://example.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Company Description</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Describe your company" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="productImgUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="flex items-center">
+                    <label className="flex w-fit cursor-pointer items-center justify-start rounded border-[1px] border-gray-200 px-4 py-2 capitalize  ">
+                      <UploadIcon />
+                      <span className="ml-2 text-sm leading-normal">
+                        Attach File
+                      </span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            field.onChange(file);
+                          }
+                        }}
+                        ref={field.ref}
+                      />
+                    </label>
+                    <small className="ml-2 text-gray-500">
+                      Optional: Attach a file related to your company
+                    </small>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="productServiceDesc"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product/Service Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Describe your product or service..."
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="productImgUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <div className="flex items-center">
+                    <label className="flex w-fit cursor-pointer items-center justify-start rounded border-[1px] border-gray-200 px-4 py-2 capitalize  ">
+                      <UploadIcon />
+                      <span className="ml-2 text-sm leading-normal">
+                        Attach File
+                      </span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            field.onChange(file);
+                          }
+                        }}
+                        ref={field.ref}
+                      />
+                    </label>
+                    <small className="ml-2 text-gray-500">
+                      Optional: Attach a file related to your product or service
+                    </small>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div>
+            <p className="mb-2">Connect CRM</p>
+            <Button className="w-full border-[1px] border-gray-200 bg-transparent shadow-none hover:bg-transparent ">
+              <Link2Icon />
+              <small className="ml-2"> Connect CRM</small>
+            </Button>
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
-            {action}
+          <div>
+            <p className="mb-2">Tone of Voice</p>
+
+            <div className="flex">
+              <div className="me-4 flex items-center shadow hover:shadow-lg">
+                <input
+                  id="inline-radio"
+                  type="radio"
+                  value=""
+                  checked
+                  name="inline-radio-group"
+                  className={cn(
+                    'h-4 w-4 border-black bg-black text-black focus:ring-black'
+                  )}
+                />
+                <label
+                  htmlFor="inline-radio"
+                  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                >
+                  Simon Sinek
+                </label>
+              </div>
+              <div className="me-4 flex items-center">
+                <input
+                  id="inline-2-radio"
+                  type="radio"
+                  value=""
+                  name="inline-radio-group"
+                  className="h-4 w-4 border-gray-300 bg-gray-100 text-gray-900 "
+                />
+                <label
+                  htmlFor="inline-2-radio"
+                  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                >
+                  Alex Hormozi
+                </label>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p className="mb-2">Sales approach</p>
+            <div className="flex justify-between gap-4">
+              <div
+                className={cn(
+                  'flex-1 space-y-3 rounded border-[1px] border-gray-200 p-4'
+                )}
+              >
+                <h2 className="text-md font-semibold">FOMO Strategy</h2>
+                <p>Fomo strategy, long description</p>
+              </div>
+              <div
+                className={cn(
+                  'flex-1 space-y-3 rounded border-[1px] border-gray-200 p-4'
+                )}
+              >
+                <h2 className="text-md font-semibold">AMSI Strategy</h2>
+                <p>Amsi strategy description</p>
+              </div>
+            </div>
+          </div>
+          <Button type="submit" className="bg-black text-white hover:bg-black ">
+            Submit
           </Button>
         </form>
       </Form>
-    </>
+    </div>
   );
 };

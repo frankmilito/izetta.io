@@ -42,7 +42,7 @@ export default function UserAuthForm() {
     //   email: data.email,
     //   callbackUrl: '/dashboard'
     // });
-    router.push('/dashboard');
+    router.push('/dashboard/company');
   };
 
   return (
